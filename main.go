@@ -29,9 +29,9 @@ import (
 
 func main() {
 	config := &crypto11.Config{
-		Path:       "/usr/lib/x86_64-linux-gnu/softhsm/libsofthsm2.so",
-		TokenLabel: "token1",
-		Pin:        "mynewpin",
+		Path:       "/usr/local/lib/softhsm/libsofthsm2.so",
+		TokenLabel: "my token",
+		Pin:        "mypin",
 	}
 	ctx, err := crypto11.Configure(config)
 	if err != nil {
@@ -47,9 +47,15 @@ func main() {
 		log.Fatalf("cert.NewSource: %v", err)
 	}
 	// Creates a client.
-	_, err  = pubsub.NewService(context.Background(), option.WithClientCertSource(cert))
+	service, err  := pubsub.NewService(context.Background(), 
+		option.WithClientCertSource(cert))
 	if err != nil {
 		log.Fatalf("pubsub.NewService: %v", err)
+	}
+
+	_, err = service.Projects.Topics.List("projects/shinfan-mtls-demo").Do()
+	if err != nil {
+		log.Fatalf("createTopic Create().Do() failed: %v", err)
 	}
 }
 
